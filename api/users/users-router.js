@@ -47,7 +47,10 @@ router.put("/:id", midwire.validateUserId, midwire.validateUser, (req, res) => {
   // and another middleware to check that the request body is valid
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", midwire.validateUserId, (req, res) => {
+  users.remove(req.params.id).then((deleted) => {
+    res.json(req.user);
+  });
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
 });
