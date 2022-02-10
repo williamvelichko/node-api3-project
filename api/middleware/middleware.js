@@ -44,6 +44,13 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
+  let body = req.body;
+  if (!body.text) {
+    res.status(400).json({ message: "missing required text field" });
+  } else {
+    req.text = body.text;
+    next();
+  }
   // DO YOUR MAGIC
 }
 

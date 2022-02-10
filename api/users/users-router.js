@@ -55,15 +55,50 @@ router.delete("/:id", midwire.validateUserId, (req, res) => {
   // this needs a middleware to verify user id
 });
 
-router.get("/:id/posts", (req, res) => {
+router.get("/:id/posts", midwire.validateUserId, (req, res) => {
+  let { id } = req.params;
+  users.getUserPosts(id).then((post) => {
+    res.json(post);
+  });
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
 });
 
-router.post("/:id/posts", (req, res) => {
-  // RETURN THE NEWLY CREATED USER POST
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
+router.post(
+  "/:id/posts",
+  midwire.validateUserId,
+  midwire.validatePost,
+  async (req, res, next) => {
+    let { id } = req.params;
+    let body = req.body;
+
+    try {
+      const newPost = await posts.insert({
+        user_id: req.params.id,
+        text: req.text,
+      });
+      res.status(201).json(newPost);
+    } catch (e) {
+      next();
+    }
+    // posts
+    //   .getById(id)
+    //   .then(({ post }) => {
+    //     return posts.insert(post);
+    //   })
+    //   .then((newPost) => {
+    //     res.json(newPost);
+    //   })
+    //   .catch((err) => {});
+    // RETURN THE NEWLY CREATED USER POST
+    // this needs a middleware to verify user id
+    // and another middleware to check that the request body is valid
+  }
+);
+router.use((err, req, res, next) => {
+  res
+    .status(err.status || 500)
+    .json({ message: "something bad has happended" });
 });
 
 // do not forget to export the router
